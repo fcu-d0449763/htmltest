@@ -1,0 +1,420 @@
+<!-- HTML generated using hilite.me --><div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #75715e">// ConsoleApplication3.cpp : 定義主控台應用程式的進入點。</span>
+<span style="color: #75715e">//</span>
+
+<span style="color: #75715e">#include &quot;stdafx.h&quot;</span>
+<span style="color: #75715e">#include &lt;stdlib.h&gt;</span>
+<span style="color: #75715e">#include &lt;string.h&gt;</span>
+<span style="color: #75715e">#pragma warning(disable : 4996)</span>
+<span style="color: #75715e">#define newsymbol(n) (SymbolTable *) malloc(sizeof(SymbolTable)*(n))</span>
+<span style="color: #75715e">/*利用動態配置大小產生新的空間 malloc會動態配置大小為sizeof(SymbolTable)*(n)的記憶體*/</span>
+
+<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">count</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                            <span style="color: #75715e">//先設定程式數為0</span>
+<span style="color: #66d9ef">typedef</span> <span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">_sym</span>                                                                      <span style="color: #75715e">//結構 為了新記憶體欄位 line/address/item/count ，並命別名SymbolTable</span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">line;</span>                                                                            <span style="color: #75715e">//宣告行數</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">address;</span>                                                                         <span style="color: #75715e">//宣告位置</span>
+	<span style="color: #66d9ef">char</span> <span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">10</span><span style="color: #f8f8f2">][</span><span style="color: #ae81ff">20</span><span style="color: #f8f8f2">];</span>                                                                   <span style="color: #75715e">//宣告擺放程式碼</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">count;</span>                                                                           <span style="color: #75715e">//宣告程式數</span>
+	<span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">_sym</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">next;</span>                                                                   <span style="color: #75715e">//宣告下一個指向(next儲存下一個節點的位址)</span>
+<span style="color: #f8f8f2">}SymbolTable;</span>                                                                     
+<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">sp</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">NULL;</span>                                                                  <span style="color: #75715e">//宣告一個結構變數 sp(sp為一個指標，指向串列之起始節點)</span>
+ 
+
+<span style="color: #75715e">/*此結構也可另外放，用 #include &quot;op.h&quot; 連接*/</span>
+<span style="color: #66d9ef">typedef</span> <span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">_opcode</span>                                                                   <span style="color: #75715e">//結構，並命別名operation 為了放指令表  </span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #66d9ef">char</span> <span style="color: #f8f8f2">opname[</span><span style="color: #ae81ff">10</span><span style="color: #f8f8f2">];</span>                                                                    <span style="color: #75715e">//指令 名稱</span>
+	<span style="color: #66d9ef">unsigned</span> <span style="color: #f8f8f2">code;</span>                                                                      <span style="color: #75715e">//指令運算碼</span>
+<span style="color: #f8f8f2">}operation;</span>                       
+
+<span style="color: #f8f8f2">operation</span> <span style="color: #f8f8f2">op[</span><span style="color: #ae81ff">10</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span> <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;add&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">0</span> <span style="color: #f8f8f2">},</span>                                                       <span style="color: #75715e">//宣告結構陣列 用於放指令與其運算碼 </span>
+					 <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;sub&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">15</span> <span style="color: #f8f8f2">},</span>                              					    <span style="color: #75715e">// op[指令個數]={{&quot;指令A&quot;,運算碼},{&quot;指令B&quot;,運算碼}};</span>
+					 <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;stl&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">25</span> <span style="color: #f8f8f2">},</span>														<span style="color: #75715e">//每一個{} 都是一個結構</span>
+					 <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;lda&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">3</span> <span style="color: #f8f8f2">},</span>														<span style="color: #75715e">//lda放在opname[10] ；3放在code裡面</span>
+					 <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;comp&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">4</span> <span style="color: #f8f8f2">},</span>														<span style="color: #75715e">//op[4].code 的值為 4 (以此類推)</span>
+					 <span style="color: #f8f8f2">{</span> <span style="color: #e6db74">&quot;beq&quot;</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">10</span> <span style="color: #f8f8f2">}};</span>	
+
+
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">begin_parsing</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">FILE</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">fptr)</span>                                                          <span style="color: #75715e">//將資料寫入記憶體</span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">i;</span>                                                                              <span style="color: #75715e">//宣告i 放行數                  </span>
+	<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">newsymbol(</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">);</span>                                                 <span style="color: #75715e">//向CPU要一個新記憶體放在p名為sp (大小為newsymbol(1))</span>
+	<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">NULL;</span>                                                                     <span style="color: #75715e">//將記憶體p的next 指向NULL</span>
+	<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">line</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                        <span style="color: #75715e">//將記憶體行數 設定為0</span>
+	<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                       <span style="color: #75715e">//將記憶體程式數 設定為0</span>
+	<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                     <span style="color: #75715e">//將新記憶體位置 設定為0               </span>
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">;</span> <span style="color: #f92672">!</span><span style="color: #f8f8f2">feof(fptr);</span> <span style="color: #f8f8f2">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>                                                       <span style="color: #75715e">//迴圈 為了讀取資料 feof(檔案名) 讀到字元(0)/沒讀到(1) </span>
+	<span style="color: #f8f8f2">{</span>
+		<span style="color: #66d9ef">char</span> <span style="color: #f8f8f2">buffer[</span><span style="color: #ae81ff">200</span><span style="color: #f8f8f2">];</span>                                                               <span style="color: #75715e">//宣告字元暫存陣列</span>
+		<span style="color: #f8f8f2">fgets(buffer,</span> <span style="color: #ae81ff">200</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">fptr);</span>                                                       <span style="color: #75715e">//將資料寫入暫存  fgets(目的,每一次讀多少字元,來源)</span>
+		<span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">pch;</span>                                                                      <span style="color: #75715e">//宣告字元指標 pch 為了放 切割的資料</span>
+		<span style="color: #f8f8f2">pch</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">strtok(buffer,</span> <span style="color: #e6db74">&quot; ,.</span><span style="color: #ae81ff">\t\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                                <span style="color: #75715e">//pch  strtok(切什麼,&quot;以什麼為切割的基準&quot;) 用於切割資料</span>
+
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">newsymbol(</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">);</span>                                                         <span style="color: #75715e">//將p的next指向新的記憶體</span>
+		<span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span>                                                                    <span style="color: #75715e">//將p直接連接新記憶體</span>
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">NULL;</span>                                                                 <span style="color: #75715e">//設定新記憶體的next=NULL</span>
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">line</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">i;</span>                                                                    <span style="color: #75715e">//設定行數為i</span>
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                   <span style="color: #75715e">//設定程式數為0</span>
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                 <span style="color: #75715e">//設定位置為0</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%02d:&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">i);</span>                                                             <span style="color: #75715e">//印出 行數 (EX:02--&gt; 當1時 印出 01)</span>
+
+
+		<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">(pch</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL)</span>                                                             <span style="color: #75715e">//迴圈 只要pch 不為NULL就一直執行以下</span>
+		<span style="color: #f8f8f2">{</span>
+			<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;&lt;%s&gt;&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">pch);</span>                                                        <span style="color: #75715e">//印出 切割的程式碼</span>
+			<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">((NULL</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strchr(pch,</span> <span style="color: #e6db74">&#39;:&#39;</span><span style="color: #f8f8f2">))</span> <span style="color: #f92672">&amp;&amp;</span> <span style="color: #f8f8f2">(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span> <span style="color: #f92672">==</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">))</span>                          <span style="color: #75715e">//判斷是否有: (有&quot;:&quot;表示為標籤) </span>
+			<span style="color: #f8f8f2">{</span>
+				<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">][</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&#39;\0&#39;</span><span style="color: #f8f8f2">;</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">;</span>
+			<span style="color: #f8f8f2">}</span>                                                                           <span style="color: #75715e">//若沒有 則要空一格 且程式數需+1</span>
+			<span style="color: #f8f8f2">strcpy(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count],</span> <span style="color: #f8f8f2">pch);</span>                                             <span style="color: #75715e">//複製切割的資料進新記憶體item欄位</span>
+			<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">;</span>                                                                 <span style="color: #75715e">//將程式數+1</span>
+			<span style="color: #f8f8f2">pch</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">strtok(NULL,</span> <span style="color: #e6db74">&quot; ,.</span><span style="color: #ae81ff">\t\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                              <span style="color: #75715e">//從上一個切割的地方繼續執行</span>
+		<span style="color: #f8f8f2">}</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;#%d</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count);</span>                                                      <span style="color: #75715e">//印出 程式數</span>
+	<span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">print_symboltable</span><span style="color: #f8f8f2">()</span>                                                               <span style="color: #75715e">//副函式 為了印出記憶體</span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #f8f8f2">SymbolTable</span>  <span style="color: #f92672">*</span><span style="color: #f8f8f2">p;</span>																	<span style="color: #75715e">//宣告結構指標 P </span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">i;</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;======================================</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%-3s %-6s%4s %1s %-9s %-9s %-9s %-9s %-9s </span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span>                                <span style="color: #75715e">//顯示最上欄位(%數字為格數，負號 =&gt;向左對齊)</span>
+		<span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;In&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;&lt;addr&gt;&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;&lt;ct&gt;&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;:&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;field1&quot;</span><span style="color: #f8f8f2">,</span>
+		<span style="color: #e6db74">&quot;field2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;field3&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;field4&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;field5&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next)</span>                                           <span style="color: #75715e">//迴圈 為了印出新記憶體 </span>
+	<span style="color: #f8f8f2">{</span>                                                                                    <span style="color: #75715e">//for (初始指向；條件；接下來指向)</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%02d: &quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">line);</span>                                                       <span style="color: #75715e">//印出 行數</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;&lt;%4X&gt;&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address);</span>                                                     <span style="color: #75715e">//印出 位置 (x:16進位)</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;&lt;%2d&gt; : &quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count);</span>                                                    <span style="color: #75715e">//印出 程式數</span>
+		<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span> <span style="color: #f8f8f2">i</span> <span style="color: #f92672">&lt;</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count;</span> <span style="color: #f8f8f2">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>                                                   <span style="color: #75715e">//迴圈 為了計算印多少程式碼在同一行 </span>
+			<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%-9s &quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[i]);</span>                                                 <span style="color: #75715e">//印出程式碼             </span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                                                    <span style="color: #75715e">//換行</span>
+	<span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+
+                                                                                         
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">parsing_symboltable1</span><span style="color: #f8f8f2">()</span>                                                              <span style="color: #75715e">/*第一階段 定義符號*/</span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">p;</span>																		 <span style="color: #75715e">//宣告結構指標變數 p</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">j;</span>                
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next)</span>                                           <span style="color: #75715e">//迴圈 重複每一行程式碼</span>
+	<span style="color: #f8f8f2">{</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(NULL</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">])</span>                                                          <span style="color: #75715e">//為了將第一列的&quot;:&quot; 改為 \0(空白) 如果第一行不為0</span>
+			<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">][strlen(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">])</span> <span style="color: #f92672">-</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&#39;\0&#39;</span><span style="color: #f8f8f2">;</span>                                   <span style="color: #75715e">//將(指令數-1)的字改為空白 strlen() 用於偵測字串有多少字元</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strcmp(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">],</span> <span style="color: #e6db74">&quot;start&quot;</span><span style="color: #f8f8f2">))</span>                                            <span style="color: #75715e">//為了確定 開始位置(start) strcmp(A,B) 用於比對A、B是否一樣</span>
+		<span style="color: #f8f8f2">{</span>																				 <span style="color: #75715e">//一樣顯示0 /不一樣顯示 1</span>
+			<span style="color: #f8f8f2">count</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">strtol(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">],NULL,</span><span style="color: #ae81ff">16</span><span style="color: #f8f8f2">);</span>                                          <span style="color: #75715e">//將 item[2]的字元轉為16進的整數放入count (注意!!count 非結構的count)</span>
+			<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">count;</span>                                                          <span style="color: #75715e">//將下一行的位置放剛剛存的count</span>
+			<span style="color: #66d9ef">continue</span><span style="color: #f8f8f2">;</span>                                                                    <span style="color: #75715e">//跳出if 回去執行for </span>
+		<span style="color: #f8f8f2">}</span>
+		<span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">count;</span>                                                              <span style="color: #75715e">//將start的下一行位置跟start位置放一樣</span>
+		                                                        
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strcmp(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">],</span> <span style="color: #e6db74">&quot;byte&quot;</span><span style="color: #f8f8f2">))</span>                                              <span style="color: #75715e">//偵測byte  比較item[1] 是否為byte 是(0)/否(1)</span>
+			<span style="color: #f8f8f2">j</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count</span> <span style="color: #f92672">-</span> <span style="color: #ae81ff">2</span><span style="color: #f8f8f2">;</span>                                                             <span style="color: #75715e">//因為byte後，每一個數佔1byte 所以共佔 程式數-2(標籤 byte)</span>
+		<span style="color: #66d9ef">else</span> <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count)</span>                                                           <span style="color: #75715e">//偵測是否為0</span>
+			<span style="color: #f8f8f2">j</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>                                                                        <span style="color: #75715e">//為0不佔位置</span>
+		<span style="color: #66d9ef">else</span> <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strcmp(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">],</span> <span style="color: #e6db74">&quot;word&quot;</span><span style="color: #f8f8f2">))</span>                                         <span style="color: #75715e">//偵測word  比較item[1] 是否為word 是(0)/否(1)</span>
+			<span style="color: #f8f8f2">j</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">3</span><span style="color: #f8f8f2">;</span>                                                                        <span style="color: #75715e">//word 佔 3byte</span>
+		<span style="color: #66d9ef">else</span>                                                                              
+			<span style="color: #f8f8f2">j</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">3</span><span style="color: #f8f8f2">;</span>																		  <span style="color: #75715e">//非特別 其他均佔3byte</span>
+
+		<span style="color: #f8f8f2">count</span> <span style="color: #f92672">+=</span> <span style="color: #f8f8f2">j;</span>                                                                        <span style="color: #75715e">//將暫存j加到count，下一輪迴圈寫入address</span>
+	<span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+
+
+<span style="color: #f8f8f2">SymbolTable</span><span style="color: #f92672">*</span> <span style="color: #a6e22e">find_address</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">s)</span>                                                          <span style="color: #75715e">//找尋位置 用於第二階段</span>
+<span style="color: #f8f8f2">{</span>                                  
+	<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">NULL;</span>                                                                  <span style="color: #75715e">//宣告結構指標變數 p</span>
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next)</span>                                              <span style="color: #75715e">//迴圈 重複每一行程式碼</span>
+	<span style="color: #f8f8f2">{</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">NULL)</span> <span style="color: #66d9ef">continue</span><span style="color: #f8f8f2">;</span>                                                   <span style="color: #75715e">//如果 item[0]為空，則跳出for 回傳p=NULL</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strcmp(s,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]))</span> <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">p;</span>                                           <span style="color: #75715e">//尋找每一行的第一個字串，如果和目標一樣 </span>
+	<span style="color: #f8f8f2">}</span>                                                                                       <span style="color: #75715e">//回傳p，這時候P應該指向目地位置(因為迴圈)</span>
+	<span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">p;</span>                                
+<span style="color: #f8f8f2">}</span>
+
+																							<span style="color: #75715e">//第二階段 用於建立目的碼</span>
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">parsing_symboltable2</span><span style="color: #f8f8f2">()</span>                                                                  
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">p,</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">q;</span>                                               
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next)</span>                                               <span style="color: #75715e">//迴圈 重複每一行程式碼</span>
+	<span style="color: #f8f8f2">{</span> 
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">((q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">find_address(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">]))</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL)</span>											 <span style="color: #75715e">//傳需要找的程式碼進副函式 如果不為NULL 執行以下</span>
+			<span style="color: #f8f8f2">itoa(q</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">],</span> <span style="color: #ae81ff">16</span><span style="color: #f8f8f2">);</span>                                                <span style="color: #75715e">//將item[2] 用 address 16進位 代替</span>
+	<span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+
+
+
+<span style="color: #66d9ef">char</span> <span style="color: #a6e22e">find_code</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">s)</span>                                                                      <span style="color: #75715e">//副函式 用於找尋 指令的code</span>
+<span style="color: #f8f8f2">{</span> 
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">i;</span>
+	<span style="color: #66d9ef">char</span> <span style="color: #f8f8f2">code</span> <span style="color: #f92672">=</span> <span style="color: #f92672">-</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">;</span>                                                                          <span style="color: #75715e">//有些指令運算碼為0，所以初始設不會出現的數</span>
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span> <span style="color: #f8f8f2">i</span> <span style="color: #f92672">&lt;</span> <span style="color: #ae81ff">10</span><span style="color: #f8f8f2">;</span> <span style="color: #f8f8f2">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>                                                                 <span style="color: #75715e">//尋找指令表</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #ae81ff">0</span> <span style="color: #f92672">==</span> <span style="color: #f8f8f2">strcmp(op[i].opname,</span> <span style="color: #f8f8f2">s))</span>                                                    <span style="color: #75715e">//如果表上有目標 則顯示0/無則顯示1</span>
+			<span style="color: #f8f8f2">code</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">op[i].code;</span>                                                               <span style="color: #75715e">//code等於查表指令的code欄位值</span>
+	<span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">code;</span>                                                                             <span style="color: #75715e">//回傳查表完的code</span>
+<span style="color: #f8f8f2">}</span>
+
+
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">code_generate</span><span style="color: #f8f8f2">()</span>                                                                          <span style="color: #75715e">//副函式 用於尋找 目的碼</span>
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #f8f8f2">SymbolTable</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">p;</span>                                                                           <span style="color: #75715e">//宣告結構指標變數 P</span>
+	<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">i;</span>               
+	<span style="color: #66d9ef">char</span> <span style="color: #f8f8f2">j;</span>
+	<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">sp</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">!=</span> <span style="color: #f8f8f2">NULL;</span> <span style="color: #f8f8f2">p</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">next)</span>                                                 <span style="color: #75715e">//迴圈 重複每一行程式碼</span>
+	<span style="color: #f8f8f2">{</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%4X:</span><span style="color: #ae81ff">\t</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">address);</span>                                                          <span style="color: #75715e">//印出 address (x:16進位)</span>
+		<span style="color: #f8f8f2">j</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">find_code(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">]);</span>                                                             <span style="color: #75715e">//尋找指令表，找出指令的code</span>
+		<span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(j</span> <span style="color: #f92672">!=</span> <span style="color: #f92672">-</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">)</span>                                                                           <span style="color: #75715e">//如果j為-1表示未在指令表找到code</span>
+			<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%02d</span><span style="color: #ae81ff">\t</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">j);</span>                                                               <span style="color: #75715e">//印出指令運算碼(code)</span>
+		<span style="color: #66d9ef">else</span>                                                                                   <span style="color: #75715e">//如果找不到則執行以下</span>
+			<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\t</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                                                      <span style="color: #75715e">//印出table鍵</span>
+		<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">2</span><span style="color: #f8f8f2">;</span> <span style="color: #f8f8f2">i</span> <span style="color: #f92672">&lt;</span> <span style="color: #f8f8f2">p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">count;</span> <span style="color: #f8f8f2">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>                                                         <span style="color: #75715e">//迴圈 印出標籤 指令 以外的值</span>
+		<span style="color: #f8f8f2">{</span>
+			<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%4X</span><span style="color: #ae81ff">\t</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">strtol(p</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">item[i],</span> <span style="color: #f8f8f2">NULL,</span> <span style="color: #ae81ff">16</span><span style="color: #f8f8f2">));</span>                                     <span style="color: #75715e">//印出 16進位的 item[i] </span>
+		<span style="color: #f8f8f2">}</span>
+		<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                                                          <span style="color: #75715e">//換行</span>
+	<span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+
+<span style="color: #66d9ef">int</span> <span style="color: #a6e22e">main</span><span style="color: #f8f8f2">()</span>                                                                              
+<span style="color: #f8f8f2">{</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;======================================</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #66d9ef">FILE</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">fptr;</span>                                                                                                            
+	<span style="color: #f8f8f2">fptr</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">fopen(</span><span style="color: #e6db74">&quot;abc.txt&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">);</span>                                                         
+	<span style="color: #f8f8f2">begin_parsing(fptr);</span>                                                                
+	<span style="color: #f8f8f2">fclose(fptr);</span>                                                                        
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">Parsing...</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #f8f8f2">print_symboltable();</span>                       
+
+																								<span style="color: #75715e">/*組譯器兩階段組譯*/</span>
+																								<span style="color: #75715e">/*第一階段 定義符號*/</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">symbol table parsing 1</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>                                                
+	<span style="color: #f8f8f2">parsing_symboltable1();</span>
+	<span style="color: #f8f8f2">print_symboltable();</span>
+
+																								<span style="color: #75715e">/*第二階段 組譯指令並產生目的碼*/</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">symbol table parsing 2</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #f8f8f2">parsing_symboltable2();</span>
+	<span style="color: #f8f8f2">print_symboltable();</span>
+																								<span style="color: #75715e">/*印出目的碼*/</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">Code generation</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;======================================</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #f8f8f2">code_generate();</span>
+
+	<span style="color: #f8f8f2">system(</span><span style="color: #e6db74">&quot;pause&quot;</span><span style="color: #f8f8f2">);</span>
+	<span style="color: #66d9ef">return</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+<span style="color: #f8f8f2">}</span>
+</pre></td></tr></table></div>
